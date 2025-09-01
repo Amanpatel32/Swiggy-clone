@@ -68,6 +68,7 @@ function TopResturant({ data }) {
           className={`flex mt-4 gap-4 duration-500`}>
 
           {
+            data &&
             data.map(({ info, cta: { link } }) => (
 
               <ResturantCard  {...info} link={link} />

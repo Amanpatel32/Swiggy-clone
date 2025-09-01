@@ -31,7 +31,7 @@ function Section({ data }) {
           </div>
         </div>
         <div style={{ translate: `-${value}%` }} className={`flex duration-500`}>
-          {data.map((item, index) => (
+          {data && data.map((item, index) => (
             <img key={index} className='w-[140px] h-[180px]'
               src={`https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_288,h_360/${item.imageId}`}
               alt={item.alt || 'Restaurant'}

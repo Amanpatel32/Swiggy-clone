@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom';
 
 function ResturantMenu() {
   const { id } = useParams()
+
   //console.log(id);
 
 
@@ -14,7 +15,7 @@ function ResturantMenu() {
   const [MenuData, setMenuData] = useState([])
   const [discountData, setDiscountData] = useState([])
   const [value, setValue] = useState(0)
-  // const [curIndex, setCurIndex] = useState(null)
+  // const [curIndex, setCurIndex] = useState(false)
 
   function HandleNext() { }
 
@@ -44,8 +45,8 @@ function ResturantMenu() {
       setDiscountData(res?.data?.cards[3]?.card?.card?.gridElements?.infoWithStyle?.offers)
       setMenuData(actualMenu)
 
-      // setMenuData(res?.data?.cards[4]?.groupedCard?.
-      //   cardGroupMap?.REGULAR?.cards[1]?.card?.card)
+      //  setMenuData(res?.data?.cards[4]?.groupedCard?.
+      //  cardGroupMap?.REGULAR?.cards[1]?.card?.card)
       //console.log(menuData);
 
 
@@ -146,38 +147,20 @@ function ResturantMenu() {
             <i className="fi  top-3 right-4 absolute fi-bs-search"></i>
           </div>
 
-          <div className='mt-4'>
+          
+
+             <div className='mt-5'>
             {
               MenuData.map(({ card: { card: { itemCards, title } } }) => (
 
-
-                // <div>
-                //   <div className=' flex justify-between'>
-                //     <h1 className='mt-4'>{title}({itemCards.length})</h1>
-                //     <i class="fi text-2xl fi-br-angle-small-up"
-                //     // onClick={() => { togglefunction(i) }}
-                //     ></i>
-                //   </div>
-                //   {
-                //     /// curIndex === i &&
-                //     <div className='mt-5'>
-                //       {
-
-                //         itemCards.map(({ card: { info } }) => (
-
-                //           <h1>{info?.name}</h1>
-
-                //         ))
-                //       }
-                //     </div>
-                //   }
-
-                // </div>
 
                 <Menucard title={title} itemCards={itemCards} />
               ))
             }
           </div>
+          
+
+         
 
         </div>
 
@@ -216,35 +199,124 @@ function ResturantMenu() {
 
   // }
 
-  function Menucard({ title, itemCards }) {
+  function Menucard(card) {
+    console.log(card);
+    let hello = false;
+    if (card["@type"]) {
+      hello = true;
+    }
+
     const [isopen, setIsopen] = useState(true)
 
     function toggleupdown() {
-      setIsopen((prev) => !prev)
+      setIsopen((curIndex) => !curIndex)
 
 
     }
-    return (
-      <div>
-        <div className='flex justify-between'>
-          <h1 className='mt-3'>{title}({itemCards.length})</h1>
-          <i class="fi text-2xl fi-br-angle-small-up" onClick={toggleupdown}></i>
-        </div>
-        {
-          isopen && <Detailmenu itemCards={itemCards} />
-        }
+    if (card.itemCards) {
+      const { title, itemCards } = card;
+      return (
+        <>
+          <div>
+            <div className='flex mt-5 justify-between'>
+              <h1 className='mt-3 font-bold text-lg'>{title}({itemCards.length})</h1>
+              <i class={"fi text-2xl fi-br-angle-small-" + (isopen ? "up" : "down")} onClick={toggleupdown}></i>
+            </div>
+            {
+              isopen && <Detailmenu itemCards={itemCards} />
+            }
 
-      </div>
-    )
+          </div >
+          <hr className='my-2 border-[10px] text-gray-200'></hr>
+        </>
+      )
+    }
+    else {
+      const { title, categories } = card;
+      //console.log(title);
+
+
+
+      return (
+        <div>
+
+          <h1> {title}</h1>
+          {
+            categories.map((data) => (
+              <Menucard card={data} />
+            ))
+          }
+
+
+        </div>
+      )
+    }
   }
 
   function Detailmenu({ itemCards }) {
+    const[ismore,setIsmore]=useState(false);
+   
     return (
-      <div>
-        {itemCards.map(({ card: { info: { name } } }) => (
-          <h1>{name}</h1>
-        ))}
-      </div>
+      <div className='my-5'>
+        {
+          itemCards.map(({ card:
+            { info:
+              { name,
+                defaultPrice,
+                price,
+                itemAttribute: { vegClassifier },
+                ratings: { aggregatedRating: { rating, ratingCountV2 } },
+                description,
+              imageId, 
+              } } }) =>{ 
+            const [ismore, setIsmore] = useState(false);
+                 let destrim = description.substring(0,120)
+                return(
+
+            <>
+              <div className='flex justify-between min-h-[182px]'>
+                <div className='w-[70%]'>
+
+                  {
+                    vegClassifier === "VEG" ? <img className='w-5 h-5 rounded-sm' src="https://imgs.search.brave.com/QeV3zw9-5SUPp-T6MLMYZ2toWALMcghytwXlj7EY4Sk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy9i/L2IyL1ZlZ19zeW1i/b2wuc3Zn" alt="" /> : <img className='w-4 h-4 rounded-sm' src="https://imgs.search.brave.com/6NmsHGBAkTf0RxRb3gFY7qml4-JDVM1ccmF5SnsINek/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvNTAwcC8w/MC80My9ub24tdmVn/ZXRhcmlhbi1zaWdu/LXZlZy1sb2dvLXN5/bWJvbC12ZWN0b3It/NTA4OTAwNDMuanBn" alt="" />
+                  }
+
+
+                  <h2 className='font-bold text-lg'>{name}</h2>
+                  <i class="fi fi-br-indian-rupee-sign"></i>
+                  <p className='font-bold text-lg'>{defaultPrice / 100 || price / 100}</p>
+                  <div className='flex items-center gap-2'> { rating >0 && ratingCountV2>0 ? <i class="fi text-green-600 fi-ss-star"></i> :null}
+                    <span>{ratingCountV2 > 0 ? ratingCountV2 : null}</span>  <span>{(rating > 0 ? rating:null)}</span>  </div>
+                
+                        {description.length > 140 ?   <div>
+                          <span className=''>{ismore ? description:destrim}</span>
+                                  {
+
+                                   <button className='font-bold' onClick={()=>{setIsmore(!ismore)}}>{ ismore? "Less":"More"}</button>
+                                  }
+   
+                 
+                        </div> : <span className=''>{description}</span>}
+                 
+
+
+                </div>
+
+                <div className='[20%] relative h-full '>
+                  <img  className ='rounded-xl w-[156px] h-[144px] 'src={"https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_300,h_300,c_fit/" + imageId} alt="" />
+                  <button className='bg-white border px-10 absolute bottom-[-20px] left-5 text-green-600 py-2 drop-shadow-xl rounded-xl text-lg font-bold '>add</button>
+                </div>
+
+
+
+              </div>
+              <hr className='my-5'></hr>
+
+            </>
+
+          )})
+        }
+      </div >
     )
   }
 }
