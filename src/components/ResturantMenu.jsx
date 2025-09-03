@@ -15,6 +15,7 @@ function ResturantMenu() {
   const [MenuData, setMenuData] = useState([])
   const [discountData, setDiscountData] = useState([])
   const [value, setValue] = useState(0)
+  const [topPicksData, setTopPicksData] = useState(null)
   // const [curIndex, setCurIndex] = useState(false)
 
   function HandleNext() { }
@@ -29,15 +30,30 @@ function ResturantMenu() {
 
       let data = await fetch(`/api/dapi/menu/pl?page-type=REGULAR_MENU&complete-menu=true&lat=28.7040592&lng=77.10249019999999&restaurantId=${MainId}&catalog_qa=undefined&submitAction=ENTER`);
       let res = await data.json()
-      // console.log(res?.data?.cards[4]?.groupedCard?.
-      //   cardGroupMap?.REGULAR);
+      //console.log(res);
 
+      // console.log(res?.data?.cards[4]?.groupedCard?.
+      //   cardGroupMap?.REGULAR?.cards[1]?.card?.card?.title);
       // eslint-disable-next-line no-unsafe-optional-chaining
-      let actualMenu = (res?.data?.cards[4]?.groupedCard?.
-        cardGroupMap?.REGULAR?.cards).filter(data => data?.card?.card?.itemCards)
+      // setTopPicksData (res?.data?.cards[4]?.groupedCard?.
+      //   cardGroupMap?.REGULAR?.cards[1]).filter(card => card.card.title == "Top Picks"[1])
+      //
+      // console.log(res?.data?.cards[4]?.groupedCard?.
+      //   cardGroupMap?.REGULAR?.cards[1].card.card.carousel)
+      // eslint-disable-next-line no-unsafe-optional-chaining
+      let cards = res?.data?.cards[4]?.groupedCard?.cardGroupMap?.REGULAR?.cards;
+      let actualMenu = cards ? cards.filter(data => data?.card?.card?.itemCards) : [];
       // console.log(res?.data?.cards[3]?.card?.card?.gridElements?.infoWithStyle?.offers);
       //console.log(actualMenu);
 
+      // let PicksData = ( res?.data?.cards[4]?.groupedCard?.
+      //   cardGroupMap?.REGULAR?.cards[1]).filter(data => data?.card?.card?.title == "Top Picks")
+      // eslint-disable-next-line no-unsafe-optional-chaining
+
+      let topPicks = (cards.filter(data => data?.card?.card?.carousel)[0]);
+      setTopPicksData(topPicks);
+      // console.log(topPicks);
+      // setpMap?.REGULAR?.cards[1]?.card?.card?.title);
 
 
 
@@ -147,9 +163,53 @@ function ResturantMenu() {
             <i className="fi  top-3 right-4 absolute fi-bs-search"></i>
           </div>
 
-          
 
-             <div className='mt-5'>
+
+          {
+            topPicksData &&
+            <>
+
+              <div className='flex justify-between mt-5'>
+                <div className='font-bold text-2xl ml-4 mt-3'>
+                  <h1>{topPicksData.card.card.title}</h1>
+                </div>
+                <div className='flex gap-3 mt-3'>
+                  <div onClick={HandleNext} className={`rounded-full cursor-pointer w-6 h-6 flex justify-center items-center ` + (value <= 0 ? "bg-gray-200" : "bg-gray-400")}>
+                    <i class={`fi text-2xl mt-1 fi-rr-arrow-small-left ` + (value <= 0 ? "text-gray-400" : "text-gray-600")}></i>
+                  </div>
+                  <div onClick={HandlePrev} className={`rounded-full cursor-pointer w-6 h-6 flex justify-center items-center ` + (value >= 145 ? "bg-gray-200" : "bg-gray-400")}>
+                    <i class={`fi text-2xl mt-1 fi-rr-arrow-small-right ` + (value >= 124 ? "text-gray-400" : "text-gray-600")}></i>
+                  </div>
+                </div>
+              </div>
+
+              <div className='flex gap-4 mt-4'>
+                {
+                  topPicksData.card.card.carousel.map(({ creativeId, dish: { info: { finalPrice, price }} }) => (
+                    // <Discount data={data} />
+                    // console.log(creativeId)
+
+                    <div className='min-w-[307px] relative h-[310px] '>
+                    <img className='w-full h-full ' src={"https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_292,h_300/" + creativeId} alt="" />
+
+                   <div className='absolute bottom-4 text-white flex justify-between w-full px-5'>  
+                        <p>₹{finalPrice/100 || price/100}</p>
+                        <button className='px-10 py-2 font-bold text-green-600 bg-white rounded-xl'>ADD</button>
+
+                   </div>
+
+                    </div>
+                    
+
+                  ))
+                }
+              </div>
+            </>
+
+          }
+
+
+          <div className='mt-5'>
             {
               MenuData.map(({ card: { card: { itemCards, title } } }) => (
 
@@ -158,9 +218,9 @@ function ResturantMenu() {
               ))
             }
           </div>
-          
 
-         
+
+
 
         </div>
 
@@ -200,7 +260,7 @@ function ResturantMenu() {
   // }
 
   function Menucard(card) {
-    console.log(card);
+    // console.log(card);
     let hello = false;
     if (card["@type"]) {
       hello = true;
@@ -254,8 +314,8 @@ function ResturantMenu() {
   }
 
   function Detailmenu({ itemCards }) {
-    const[ismore,setIsmore]=useState(false);
-   
+    const [ismore, setIsmore] = useState(false);
+
     return (
       <div className='my-5'>
         {
@@ -266,55 +326,56 @@ function ResturantMenu() {
                 price,
                 itemAttribute: { vegClassifier },
                 ratings: { aggregatedRating: { rating, ratingCountV2 } },
-                description,
-              imageId, 
-              } } }) =>{ 
+                description = "",
+                imageId,
+              } } }) => {
             const [ismore, setIsmore] = useState(false);
-                 let destrim = description.substring(0,120)
-                return(
+            let destrim = description.substring(0, 120)
+            return (
 
-            <>
-              <div className='flex justify-between min-h-[182px]'>
-                <div className='w-[70%]'>
+              <>
+                <div className='flex justify-between min-h-[182px]'>
+                  <div className='w-[70%]'>
 
-                  {
-                    vegClassifier === "VEG" ? <img className='w-5 h-5 rounded-sm' src="https://imgs.search.brave.com/QeV3zw9-5SUPp-T6MLMYZ2toWALMcghytwXlj7EY4Sk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy9i/L2IyL1ZlZ19zeW1i/b2wuc3Zn" alt="" /> : <img className='w-4 h-4 rounded-sm' src="https://imgs.search.brave.com/6NmsHGBAkTf0RxRb3gFY7qml4-JDVM1ccmF5SnsINek/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvNTAwcC8w/MC80My9ub24tdmVn/ZXRhcmlhbi1zaWdu/LXZlZy1sb2dvLXN5/bWJvbC12ZWN0b3It/NTA4OTAwNDMuanBn" alt="" />
-                  }
+                    {
+                      vegClassifier === "VEG" ? <img className='w-5 h-5 rounded-sm' src="https://imgs.search.brave.com/QeV3zw9-5SUPp-T6MLMYZ2toWALMcghytwXlj7EY4Sk/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly91cGxv/YWQud2lraW1lZGlh/Lm9yZy93aWtpcGVk/aWEvY29tbW9ucy9i/L2IyL1ZlZ19zeW1i/b2wuc3Zn" alt="" /> : <img className='w-4 h-4 rounded-sm' src="https://imgs.search.brave.com/6NmsHGBAkTf0RxRb3gFY7qml4-JDVM1ccmF5SnsINek/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/dmVjdG9yc3RvY2su/Y29tL2kvNTAwcC8w/MC80My9ub24tdmVn/ZXRhcmlhbi1zaWdu/LXZlZy1sb2dvLXN5/bWJvbC12ZWN0b3It/NTA4OTAwNDMuanBn" alt="" />
+                    }
 
 
-                  <h2 className='font-bold text-lg'>{name}</h2>
-                  <i class="fi fi-br-indian-rupee-sign"></i>
-                  <p className='font-bold text-lg'>{defaultPrice / 100 || price / 100}</p>
-                  <div className='flex items-center gap-2'> { rating >0 && ratingCountV2>0 ? <i class="fi text-green-600 fi-ss-star"></i> :null}
-                    <span>{ratingCountV2 > 0 ? ratingCountV2 : null}</span>  <span>{(rating > 0 ? rating:null)}</span>  </div>
-                
-                        {description.length > 140 ?   <div>
-                          <span className=''>{ismore ? description:destrim}</span>
-                                  {
+                    <h2 className='font-bold text-lg'>{name}</h2>
+                    <i class="fi fi-br-indian-rupee-sign"></i>
+                    <p className='font-bold text-lg'>{defaultPrice / 100 || price / 100}</p>
+                    <div className='flex items-center gap-2'> {rating > 0 && ratingCountV2 > 0 ? <i class="fi text-green-600 fi-ss-star"></i> : null}
+                      <span>{ratingCountV2 > 0 ? ratingCountV2 : null}</span>  <span>({rating > 0 ? rating : null})</span>  </div>
 
-                                   <button className='font-bold' onClick={()=>{setIsmore(!ismore)}}>{ ismore? "Less":"More"}</button>
-                                  }
-   
-                 
-                        </div> : <span className=''>{description}</span>}
-                 
+                    {description.length > 140 ? <div>
+                      <span className=''>{ismore ? description : destrim}</span>
+                      {
+
+                        <button className='font-bold' onClick={() => { setIsmore(!ismore) }}>{ismore ? "Less" : "More"}</button>
+                      }
+
+
+                    </div> : <span className=''>{description}</span>}
+
+
+
+                  </div>
+
+                  <div className='[20%] relative h-full '>
+                    <img className='rounded-xl w-[156px] h-[144px] ' src={"https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_300,h_300,c_fit/" + imageId} alt="" />
+                    <button className='bg-white border px-10 absolute bottom-[-20px] left-5 text-green-600 py-2 drop-shadow-xl rounded-xl text-lg font-bold '>add</button>
+                  </div>
+
 
 
                 </div>
+                <hr className='my-5'></hr>
 
-                <div className='[20%] relative h-full '>
-                  <img  className ='rounded-xl w-[156px] h-[144px] 'src={"https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_300,h_300,c_fit/" + imageId} alt="" />
-                  <button className='bg-white border px-10 absolute bottom-[-20px] left-5 text-green-600 py-2 drop-shadow-xl rounded-xl text-lg font-bold '>add</button>
-                </div>
+              </>
 
-
-
-              </div>
-              <hr className='my-5'></hr>
-
-            </>
-
-          )})
+            )
+          })
         }
       </div >
     )
