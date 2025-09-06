@@ -1,14 +1,13 @@
 import React, { useState } from 'react'
 import { useEffect } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { coordinates } from '../context/contextApi';
+import { useContext } from 'react';
 
 function ResturantMenu() {
   const { id } = useParams()
 
   //console.log(id);
-
-
-
   // console.log(id.split("-").at(-1).slice(4));
   const MainId = id.split("-").at(-1).slice(4);
   const [ResturantInfo, setResturantInfo] = useState([])
@@ -16,6 +15,7 @@ function ResturantMenu() {
   const [discountData, setDiscountData] = useState([])
   const [value, setValue] = useState(0)
   const [topPicksData, setTopPicksData] = useState(null)
+  const{cord:{lat,lng}}=useContext(coordinates);
   // const [curIndex, setCurIndex] = useState(false)
 
   function HandleNext() { }
@@ -28,7 +28,7 @@ function ResturantMenu() {
 
     try {
 
-      let data = await fetch(`/api/dapi/menu/pl?page-type=REGULAR_MENU&complete-menu=true&lat=28.7040592&lng=77.10249019999999&restaurantId=${MainId}&catalog_qa=undefined&submitAction=ENTER`);
+      let data = await fetch(`/api/dapi/menu/pl?page-type=REGULAR_MENU&complete-menu=true&lat=${lat}&lng=${lng}&restaurantId=${MainId}&catalog_qa=undefined&submitAction=ENTER`);
       let res = await data.json()
       //console.log(res);
 
@@ -54,9 +54,6 @@ function ResturantMenu() {
       setTopPicksData(topPicks);
       // console.log(topPicks);
       // setpMap?.REGULAR?.cards[1]?.card?.card?.title);
-
-
-
       setResturantInfo(res?.data?.cards[2]?.card?.card.info)
       setDiscountData(res?.data?.cards[3]?.card?.card?.gridElements?.infoWithStyle?.offers)
       setMenuData(actualMenu)
@@ -64,24 +61,17 @@ function ResturantMenu() {
       //  setMenuData(res?.data?.cards[4]?.groupedCard?.
       //  cardGroupMap?.REGULAR?.cards[1]?.card?.card)
       //console.log(menuData);
-
-
-
     }
     catch (error) {
       console.error('Error fetching data:', error);
       setMenuData([]);
       setDiscountData([]);
     }
-
   }
-
   useEffect(() => {
     fetchMenu();
 
   }, [])
-
-
   // console.log(id);
 
   return (
@@ -95,7 +85,6 @@ function ResturantMenu() {
             <Link to={"/"}> <span className=' hover:text-slate-950'>Home </span> </Link> <Link to={"/"}> / <span className='hover:text-slate-950 cursor-pointer'>{ResturantInfo.city}</span> </Link>/ <span className=' text-slate-950 cursor-pointer' >{ResturantInfo.name}</span>
           </p>
           <h1 className='font-bold text-3xl px-4 pb-4'>{ResturantInfo.name}</h1>
-
           <div className='w-full  bg-gradient-to-t from-slate-300/70 p-3  h-[162px] mt-4 rounded-[30px]'>
             <div className='w-full h-full border border-slate-300/70 rounded-[30px] p-4 bg-white'>
 
@@ -115,22 +104,12 @@ function ResturantMenu() {
                 </div>
                 <div className='flex flex-col gap-4 text-sm font-semibold'>
                   <p className='font-semibold'>Outlet . <span className='text-gray-400'>{ResturantInfo.locality}</span></p>
-
                   <p>{ResturantInfo?.sla?.slaString}</p>
                 </div>
-
               </div>
-
-
-
             </div>
-
           </div>
-
         </div>
-
-
-
         <div className='w-[800px] mx-auto mt-2 px-2 overflow-hidden'>
 
           <div className='flex justify-between mt-5'>
@@ -185,30 +164,22 @@ function ResturantMenu() {
 
               <div className='flex gap-4 mt-4'>
                 {
-                  topPicksData.card.card.carousel.map(({ creativeId, dish: { info: { finalPrice, price }} }) => (
+                  topPicksData.card.card.carousel.map(({ creativeId, dish: { info: { finalPrice, price } } }) => (
                     // <Discount data={data} />
                     // console.log(creativeId)
-
                     <div className='min-w-[307px] relative h-[310px] '>
-                    <img className='w-full h-full ' src={"https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_292,h_300/" + creativeId} alt="" />
+                      <img className='w-full h-full ' src={"https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,w_292,h_300/" + creativeId} alt="" />
 
-                   <div className='absolute bottom-4 text-white flex justify-between w-full px-5'>  
-                        <p>₹{finalPrice/100 || price/100}</p>
+                      <div className='absolute bottom-4 text-white flex justify-between w-full px-5'>
+                        <p>₹{finalPrice / 100 || price / 100}</p>
                         <button className='px-10 py-2 font-bold text-green-600 bg-white rounded-xl'>ADD</button>
-
-                   </div>
-
+                      </div>
                     </div>
-                    
-
-                  ))
-                }
+                  ))}
               </div>
             </>
 
           }
-
-
           <div className='mt-5'>
             {
               MenuData.map(({ card: { card: { itemCards, title } } }) => (
@@ -218,17 +189,7 @@ function ResturantMenu() {
               ))
             }
           </div>
-
-
-
-
         </div>
-
-
-
-
-
-
       </div>
     </div >
   )

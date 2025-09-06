@@ -2,9 +2,10 @@ import React from 'react'
 import { TbPlayCardStar } from 'react-icons/tb';
 import ResturantCard from './ResturantCard';
 
-function TopResturant({ data }) {
+function TopResturant({ data ,title,onlinetitle}) {
 
 
+  // console.log(title?.cards[1].card.card.header.title);
 
   // const [data, setData] = React.useState([]);
   const [value, setValue] = React.useState(0);
@@ -46,7 +47,7 @@ function TopResturant({ data }) {
         <div className='flex justify-between mt-5'>
 
           <div className='font-bold text-2xl ml-4 mt-3'>
-            <h1>Top restaurant chains Delhi</h1>
+            <h1>{title}</h1>
           </div>
           <div className='flex gap-3 mt-3'>
             <div onClick={HandleNext} className={`rounded-full cursor-pointer w-6 h-6 flex justify-center items-center ` + (value <= 0 ? "bg-gray-200" : "bg-gray-400")}>
